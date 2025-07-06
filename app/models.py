@@ -21,6 +21,26 @@ class User(UserMixin, db.Model):
     about_me: so.Mapped[Optional[str]] = so.mapped_column(sa.String(140))
     last_seen: so.Mapped[Optional[datetime]] = so.mapped_column(default=lambda: datetime.now(timezone.utc))
 
+    # many to many followers r/ship
+
+    followers = sa.Table(
+    'followers',
+    db.metadata,
+    sa.Column('follower_id', sa.Integer, sa.ForeignKey('user.id'), primary_key=True),
+    sa.Column('followed_id', sa.Integer, sa.ForeignKey('user.id'), primary_key=True))
+
+    following: so.WriteOnlyMapped['User'] = so.relationship(
+        secondary=followers, primaryjoin=(followers.c.follower_id == id),
+        secondaryjoin=(followers.c.followed_id == id),
+        back_populates='followers'
+    )
+    followers: so.WriteOnlyMapped['User'] = so.relationship(
+        secondary=followers, primaryjoin=(followers.c.followed_id == id),
+        secondaryjoin=(followers.c.follower_id == id),
+        back_populates='following'
+    )
+
+
     def __repr__(self):
         return '<user{}>'.format(self.username)
     
@@ -46,3 +66,5 @@ class Post(db.Model):
 
     def __repr__(self):
         return '<post{}>'.format(self.body)
+    
+
