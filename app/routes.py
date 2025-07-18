@@ -67,6 +67,7 @@ def user(username):
         {'author': user, 'body': 'Test 1'},
         {'author': user, 'body': 'Test 2'}
     ]
+    form = EmptyForm
     return render_template('user.html', user=user, posts=posts)
 
 @app.route('/edit_profile', methods=['GET', 'POST'])
