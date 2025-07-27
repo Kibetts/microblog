@@ -105,6 +105,7 @@ class Post(db.Model):
     author: so.Mapped[User] = so.relationship(back_populates='posts')
 
     def __repr__(self):
-        return '<post{}>'.format(self.body)
+        return f'<Post {self.body}>'
+
     
 

@@ -14,6 +14,7 @@ class Config:
     MAIL_USERNAME =os.environ.get('MAIL_USERNAME')
     MAIL_PASSWORD = os.environ.get('MAIL_PASSWORD')
     ADMINS = ['koskebrian.com']
+    POSTS_PER_PAGE = 3
 
 # if not app.debug:
 #      if app.config['MAIL_SERVER']:
