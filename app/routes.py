@@ -14,6 +14,7 @@ def before_request():
         current_user.last_seen = datetime.now(timezone.utc)
         db.session.commit()
 
+
 @app.route('/')
 @app.route('/index')
 @login_required
@@ -26,17 +27,16 @@ def index():
         flash('Your post is now live!')
         return redirect(url_for('index'))
     
-    posts = [
-        {
-            'author': {'username': 'John'},
-            'body': 'Beautiful day in Nairobi'
-        },
-        {
-            'author': {'username': 'Susan'},
-            'body': {'The avangers movie was so cool'}
-        }
-    ]
-    return render_template('index.html', title='Home Page')
+    posts = db.session.scalars(current_user.following_posts()).all()
+    return render_template('index.html', title='Home Page', form=form, posts=posts)
+
+
+@app.route('/explore')
+@login_required
+def explore():
+    query = sa.select(Post).order_by(Post.timestamp.desc())
+    posts = db.session.scalars(query).all()
+    return render_template('index.html', title='Explore', posts=posts)
 
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -58,10 +58,12 @@ def login():
         return redirect(next_page)
     return render_template('login.html', title='Sign In', form=form)    
 
+
 @app.route('/logout')
 def logout():
     logout_user()
     return redirect(url_for('index'))
+
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
@@ -88,6 +90,7 @@ def user(username):
     ]
     form = EmptyForm
     return render_template('user.html', user=user, posts=posts)
+
 
 @app.route('/edit_profile', methods=['GET', 'POST'])
 @login_required
